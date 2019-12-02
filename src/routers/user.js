@@ -66,7 +66,7 @@ router.patch('/users/:id', async (req, res) => {
         }
         
         updates.forEach(update => user[update] = req.body[update])
-        user.save()
+        await user.save()
 
         res.send(user)
     } catch(e) {
