@@ -55,14 +55,18 @@ router.patch('/users/:id', async (req, res) => {
     }
 
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        })
-
+        // Here we could have used findByIdAndUpdate() but it does not
+        // trigger the "save()" function on the model instance, rather
+        // does a db operation directly. This will cause our middleware
+        // function (to hash passwords) to not run since save is never
+        // triggered. (Similar thing is present in tasks update)
+        const user = await User.findById(req.params.id)
         if (!user) {
             return res.status(404).send()
         }
+        
+        updates.forEach(update => user[update] = req.body[update])
+        user.save()
 
         res.send(user)
     } catch(e) {

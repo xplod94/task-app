@@ -1,7 +1,8 @@
 const validator = require('validator')
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -39,5 +40,24 @@ const User = mongoose.model('User', {
         }
     }
 })
+
+// This is known as middleware in mongoose. Provides us with hooks
+// to run before and after mongoose operations. We need to create
+// schemas to define middleware functions. The function below will
+// run before (pre) the save function of instances of User model.
+// *Imp: It needs non-arrow function as callback since it exposes
+// the model instance in "this" and arrow functions don't bind to
+// this scope.
+userSchema.pre('save', async function(next) {
+    const user = this;
+
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+
+    next()
+})
+
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

@@ -11,7 +11,6 @@ app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
 
-// Created by Pranav Pande
 // Start server
 app.listen(port, () => {
     console.log("Server started on port " + port)
