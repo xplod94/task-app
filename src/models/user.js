@@ -49,6 +49,18 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+
+// It is used to create a virtual path in the schema, one
+// which does not exist in the database but we can populate
+// it in out queries. It also sets us the relationship
+// between Task schema owner and User schema id just like
+// a foreign key.
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 // Methods property allows us to create custom methods on
 // a model instance. This method will be available to each
 // instance of the model. Also, this is the reason it is
