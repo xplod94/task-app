@@ -4,7 +4,7 @@ const Task = require('../models/task')
 
 const router = new express.Router()
 
-// Create a task
+// 1 Create a task
 router.post('/tasks', auth, async (req, res) => {
     const task = new Task({
         ...req.body,
@@ -19,7 +19,7 @@ router.post('/tasks', auth, async (req, res) => {
     }
 })
 
-// Get all tasks
+// 2 Get all tasks
 router.get('/tasks', auth, async (req, res) => {
     try {
         await req.user.populate('tasks').execPopulate()
@@ -29,7 +29,7 @@ router.get('/tasks', auth, async (req, res) => {
     }
 })
 
-// Get one task (by ID)
+// 3 Get one task (by ID)
 router.get('/tasks/:id', auth, async (req, res) => {
     const _id = req.params.id
 
@@ -46,7 +46,7 @@ router.get('/tasks/:id', auth, async (req, res) => {
     }
 })
 
-// Update a task (by ID)
+// 4 Update a task (by ID)
 router.patch('/tasks/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = Object.keys(Task.schema.paths)
@@ -73,7 +73,7 @@ router.patch('/tasks/:id', auth, async (req, res) => {
     }
 })
 
-// Delete a task (by ID)
+// 5 Delete a task (by ID)
 router.delete('/tasks/:id', auth, async (req, res) => {
     const _id = req.params.id
 
