@@ -49,7 +49,6 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
-
 // Methods property allows us to create custom methods on
 // a model instance. This method will be available to each
 // instance of the model. Also, this is the reason it is
@@ -67,6 +66,23 @@ userSchema.methods.generateAuthToken = async function() {
     await user.save()
 
     return token
+}
+
+// This is the js prototype toJSON method which we are
+// overriding t oreturn the user without sensitive data
+// like password and tokens. Whenever user is sent back
+// to the client via res.send(), it internally calls
+// JSON.stringify() on the user object which in turn
+// calls the prototype toJSON() method to make sure the
+// object is JSON before stringifying it.
+userSchema.methods.toJSON = function() {
+    const user = this
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
 }
 
 // Statics property allows us to define custom methods on a

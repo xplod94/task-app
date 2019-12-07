@@ -4,7 +4,7 @@ const User = require('../models/user')
 
 const router = new express.Router()
 
-// Create user (sign up)
+// 1 Create user (sign up)
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
 
@@ -17,7 +17,7 @@ router.post('/users', async (req, res) => {
     }
 })
 
-// Login
+// 2 Login
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -28,7 +28,7 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-// Logout
+// 3 Logout
 router.post('/users/logout', auth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter(token => token.token !== req.token)
@@ -39,7 +39,7 @@ router.post('/users/logout', auth, async (req, res) => {
     }
 })
 
-// Logout from all sessions
+// 4 Logout from all sessions
 router.post('/users/logoutAll', auth, async (req, res) => {
     try {
         req.user.tokens = []
@@ -50,30 +50,13 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     }
 })
 
-// Get user profile
+// 5 Get user profile
 router.get('/users/me', auth, async (req, res) => {
     res.send(req.user)
 })
 
-// Get one user (by ID)
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-
-    try {
-        const user = await User.findById(_id)
-
-        if (!user) {
-            return res.status(404).send()
-        }
-
-        res.send(user)
-    } catch(e) {
-        res.status(500).send(e)
-    }
-})
-
-// Update a user (by ID)
-router.patch('/users/:id', async (req, res) => {
+// 6 Update a user
+router.patch('/users/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = Object.keys(User.schema.paths)
     const isUpdateAllowed = updates.every(update => allowedUpdates.includes(update))
@@ -85,35 +68,20 @@ router.patch('/users/:id', async (req, res) => {
     }
 
     try {
-        // Here we could have used findByIdAndUpdate() but it does not
-        // trigger the "save()" function on the model instance, rather
-        // does a db operation directly. This will cause our middleware
-        // function (to hash passwords) to not run since save is never
-        // triggered. (Similar thing is present in tasks update)
-        const user = await User.findById(req.params.id)
-        if (!user) {
-            return res.status(404).send()
-        }
-        
-        updates.forEach(update => user[update] = req.body[update])
-        await user.save()
+        updates.forEach(update => req.user[update] = req.body[update])
+        await req.user.save()
 
-        res.send(user)
+        res.send(req.user)
     } catch(e) {
         res.status(400).send(e)
     }
 })
 
-// delete a user (by ID)
-router.delete('/users/:id', async (req, res) => {
+// 7 Delete a user
+router.delete('/users/me', auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-
-        if (!user) {
-            return res.status(404).send()
-        }
-
-        res.send(user)
+        await req.user.remove()
+        res.send(req.user)
     } catch(e) {
         res.status(500).send()
     }
