@@ -53,7 +53,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
-
 // It is used to create a virtual path in the schema, one
 // which does not exist in the database but we can populate
 // it in out queries. It also sets us the relationship
