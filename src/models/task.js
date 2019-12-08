@@ -16,7 +16,7 @@ const taskSchema = new mongoose.Schema({
         required: true
     }
 }, {
-    timestamps: true
+    timestamps: true    // Adds createdAt & updatedAt fields to documents
 })
 
 const Task = mongoose.model('Task', taskSchema)

@@ -55,9 +55,9 @@ const userSchema = new mongoose.Schema({
 
 // It is used to create a virtual path in the schema, one
 // which does not exist in the database but we can populate
-// it in out queries. It also sets us the relationship
-// between Task schema owner and User schema id just like
-// a foreign key.
+// it in our queries. It also sets the relationship between
+// Task schema owner and User schema id just like a foreign
+// key.
 userSchema.virtual('tasks', {
     ref: 'Task',
     localField: '_id',
@@ -84,7 +84,7 @@ userSchema.methods.generateAuthToken = async function() {
 }
 
 // This is the js prototype toJSON method which we are
-// overriding t oreturn the user without sensitive data
+// overriding to return the user without sensitive data
 // like password and tokens. Whenever user is sent back
 // to the client via res.send(), it internally calls
 // JSON.stringify() on the user object which in turn
