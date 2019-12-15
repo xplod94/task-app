@@ -77,7 +77,7 @@ userSchema.methods.generateAuthToken = async function() {
     const user = this
 
     // Generate the token
-    const token = jwt.sign({ _id: user._id.toString() }, 'mynodecourse', { expiresIn: '7 days' })
+    const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '7 days' })
 
     // Save the token to the db (for multiple device logins, multiple tokens need to be saved)
     user.tokens = user.tokens.concat({ token })
