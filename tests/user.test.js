@@ -77,11 +77,20 @@ test('Should not login nonexistant user', async () => {
 })
 
 test('Should get profile for user', async () => {
-    await request(app)
+    const response = await request(app)
         .get('/users/me')
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .send()
         .expect(200)
+
+    // Creating the user profile response from the input user
+    const userOneProfile = JSON.parse(JSON.stringify(userOne))
+    userOneProfile._id = userOneProfile._id.toString()
+    delete userOneProfile.tokens
+    delete userOneProfile.password
+
+    // Assertion to test if the user profile returned is same
+    expect(response.body).toMatchObject(userOneProfile)
 })
 
 test('Should not get profile for unauthenticated user', async () => {
