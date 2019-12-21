@@ -72,13 +72,13 @@ router.patch('/tasks/:id', auth, async (req, res) => {
     const allowedUpdates = Object.keys(Task.schema.paths)
     const isUpdateAllowed = updates.every(update => allowedUpdates.includes(update))
 
-    if (!isUpdateAllowed) {
-        res.status(400).send({
-            error: "Invalid field!"
-        })
-    }
-
     try {
+        if (!isUpdateAllowed) {
+            res.status(400).send({
+                error: "Invalid field!"
+            })
+        }
+
         const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
         if (!task) {
             res.status(404).send()

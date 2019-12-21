@@ -1,26 +1,11 @@
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const request = require('supertest')
 
 const app = require('../src/app')
 const User = require('../src/models/user')
 
-const userOneId = new mongoose.Types.ObjectId()
-const userOne = {
-    _id: userOneId,
-    name: "Tony Stark",
-    age: 45,
-    email: "tony@starkindustries.us",
-    password: "ilovepepper",
-    tokens: [{
-        token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-    }]
-}
+const { userOneId, userOne, setupDatabase } = require('./fixtures/db')
 
-beforeEach(async () => {
-    await User.deleteMany()
-    await new User(userOne).save()
-})
+beforeEach(setupDatabase)
 
 test('Should sign-up user', async () => {
     const response = await request(app)
@@ -148,11 +133,21 @@ test('Should update valid user fields', async () => {
     expect(user.name).toBe("Pranav Pande")
 })
 
-test('Should not update invalid user fields', async () => {
+test('Should not update unauthenticated user fields', async () => {
     await request(app)
         .patch('/users/me')
         .send({
             name: "Pranav Pande"
         })
         .expect(401)
+})
+
+test('Should not update invalid fields for a user', async () => {
+    await request(app)
+        .patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            location: "Bengaluru"
+        })
+        .expect(400)
 })

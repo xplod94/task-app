@@ -77,13 +77,13 @@ router.patch('/users/me', auth, async (req, res) => {
     const allowedUpdates = Object.keys(User.schema.paths)
     const isUpdateAllowed = updates.every(update => allowedUpdates.includes(update))
 
-    if (!isUpdateAllowed) {
-        return res.status(400).send({
-            error: "Invalid field!"
-        })
-    }
-
     try {
+        if (!isUpdateAllowed) {
+            return res.status(400).send({
+                error: "Invalid field!"
+            })
+        }
+
         updates.forEach(update => req.user[update] = req.body[update])
         await req.user.save()
 
